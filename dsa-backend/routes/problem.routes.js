@@ -1,6 +1,5 @@
 const express = require('express');
 const service = require('../db/problem.service');
-const uuid = require('uuid');
 const router = express.Router();
 
 router.get('/getAllProblem', async (req, res, next) => {
@@ -58,6 +57,28 @@ router.post('/addCode', async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+});
+
+router.post('/deleteCode', async (req, res, next) => {
+  try {
+    const { codeId, problemId } = req.body;
+    if (!codeId || !problemId) {
+      const err = new Error('Bad request');
+      err.code = 405;
+      throw err;
+    }
+    const deletedCode = await service.deleteCode(codeId, problemId);
+    if (!deletedCode) {
+      const err = new Error('Unable to delete');
+      err.code = 400;
+      throw err;
+    }
+    res.json({
+      message: 'successfully deleted',
+    });
+  } catch (e) {
+    next(e);
   }
 });
 

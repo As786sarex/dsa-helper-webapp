@@ -55,4 +55,23 @@ service.addCodeSnippet = async (id, payload) => {
   );
 };
 
+service.deleteCode = async (codeId, problemId) => {
+  const deleted = await codeModel.deleteOne({ _id: codeId });
+  if (!deleted) {
+    const err = new Error('Unable to delete code');
+    err.status = 400;
+    throw err;
+  }
+  const deletedCode = await problemsModel.findByIdAndUpdate(
+    problemId,
+    {
+      $pull: { codes: codeId },
+    },
+    {
+      useFindAndModify: false,
+    }
+  );
+  return deletedCode;
+};
+
 module.exports = service;
